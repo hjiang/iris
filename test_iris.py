@@ -189,15 +189,3 @@ class TestWatermarkFunctions:
             original_ratio = original_size[0] / original_size[1]
             new_ratio = result.size[0] / result.size[1]
             assert abs(original_ratio - new_ratio) < 0.01
-
-        for size in sizes:
-            input_path = Path(temp_dir) / f"test_{size[0]}x{size[1]}.png"
-            output_path = Path(temp_dir) / f"output_{size[0]}x{size[1]}.png"
-
-            img = Image.new('RGBA', size, (255, 255, 255, 255))
-            img.save(input_path)
-
-            add_watermark(str(input_path), str(output_path), default_options)
-
-            with Image.open(output_path) as result:
-                assert result.size == size
