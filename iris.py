@@ -87,9 +87,10 @@ def add_watermark(image_path: str, output_path: str, options: WatermarkOptions) 
         result = Image.alpha_composite(img, shadow_layer)
         result = Image.alpha_composite(result, watermark)
 
-        # Save result
+        # Save result in original format
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        result.save(output_path, 'PNG')
+        original_format = Image.open(image_path).format or 'PNG'
+        result.save(output_path, original_format)
 
 def process_images(input_folder: str, output_folder: str, options: WatermarkOptions) -> None:
     """Process all images in the input folder and its subfolders."""
@@ -99,7 +100,7 @@ def process_images(input_folder: str, output_folder: str, options: WatermarkOpti
     for img_path in input_path.rglob('*'):
         if img_path.suffix.lower() in ['.jpg', '.jpeg', '.png', '.bmp', '.tiff']:
             relative_path = img_path.relative_to(input_path)
-            output_file = output_path / relative_path.with_suffix('.png')
+            output_file = output_path / relative_path
 
             print(f"Processing: {img_path}")
             add_watermark(str(img_path), str(output_file), options)

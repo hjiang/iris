@@ -123,8 +123,13 @@ class TestWatermarkFunctions:
         # Verify output structure and files
         assert os.path.exists(output_dir)
         assert os.path.exists(output_dir / "test1.png")
-        assert os.path.exists(output_dir / "test2.png")  # Note: jpg converted to png
+        assert os.path.exists(output_dir / "test2.png")
         assert os.path.exists(output_dir / "subfolder" / "test3.png")
+        
+        # Verify format preservation
+        with Image.open(test_images[0]) as orig:
+            with Image.open(output_dir / "test1.png") as out:
+                assert out.format == orig.format
 
     def test_invalid_image(self, temp_dir, default_options):
         # Test with invalid image file
