@@ -14,6 +14,7 @@ class WatermarkOptions:
         self.shadow = ShadowOptions(**kwargs.get('shadow', {}))
         self.downsize_to = kwargs.get('downsize_to', None)
 
+
 class ShadowOptions:
     def __init__(self, **kwargs):
         self.offset_x = kwargs.get('offset_x', 3)
@@ -25,12 +26,13 @@ class ShadowOptions:
     def offset(self) -> Tuple[int, int]:
         return (self.offset_x, self.offset_y)
 
+
 def add_watermark(image_path: str, output_path: str, options: WatermarkOptions) -> None:
     """Add watermark to an image with shadow effect."""
     with Image.open(image_path) as img:
         if img.mode != 'RGBA':
             img = img.convert('RGBA')
-            
+
         # Downsize image if needed
         if options.downsize_to:
             max_size = options.downsize_to
@@ -92,6 +94,7 @@ def add_watermark(image_path: str, output_path: str, options: WatermarkOptions) 
         original_format = Image.open(image_path).format or 'PNG'
         result.save(output_path, original_format)
 
+
 def process_images(input_folder: str, output_folder: str, options: WatermarkOptions) -> None:
     """Process all images in the input folder and its subfolders."""
     input_path = Path(input_folder)
@@ -100,10 +103,11 @@ def process_images(input_folder: str, output_folder: str, options: WatermarkOpti
     for img_path in input_path.rglob('*'):
         if img_path.suffix.lower() in ['.jpg', '.jpeg', '.png', '.bmp', '.tiff']:
             relative_path = img_path.relative_to(input_path)
-            output_file = output_path / relative_path
+            output_path = output_path / relative_path
 
             print(f"Processing: {img_path}")
-            add_watermark(str(img_path), str(output_file), options)
+            add_watermark(str(img_path), str(output_path), options)
+
 
 def parse_args() -> Dict[str, Any]:
     parser = argparse.ArgumentParser(description='Add watermark with shadow to images')
@@ -122,6 +126,7 @@ def parse_args() -> Dict[str, Any]:
 
     return vars(parser.parse_args())
 
+
 def validate_options(args: Dict[str, Any]) -> bool:
     """Validate command line arguments."""
     if not os.path.exists(args['input']):
@@ -137,6 +142,7 @@ def validate_options(args: Dict[str, Any]) -> bool:
         return False
 
     return True
+
 
 def main():
     args = parse_args()
