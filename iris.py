@@ -92,6 +92,11 @@ def add_watermark(image_path: str, output_path: str, options: WatermarkOptions) 
         # Save result in original format
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         original_format = Image.open(image_path).format or 'PNG'
+        
+        # Convert to RGB if saving as JPEG
+        if original_format.upper() in ['JPEG', 'JPG']:
+            result = result.convert('RGB')
+            
         result.save(output_path, original_format)
 
 
