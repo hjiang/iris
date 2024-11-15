@@ -12,6 +12,7 @@ class WatermarkOptions:
         self.opacity = kwargs.get('opacity', 0.5)
         self.padding = kwargs.get('padding', 20)
         self.shadow = ShadowOptions(**kwargs.get('shadow', {}))
+        self.downsize_to = kwargs.get('downsize_to', None)
 
 class ShadowOptions:
     def __init__(self, **kwargs):
@@ -29,6 +30,14 @@ def add_watermark(image_path: str, output_path: str, options: WatermarkOptions) 
     with Image.open(image_path) as img:
         if img.mode != 'RGBA':
             img = img.convert('RGBA')
+            
+        # Downsize image if needed
+        if options.downsize_to:
+            max_size = options.downsize_to
+            if img.width > max_size or img.height > max_size:
+                ratio = min(max_size / img.width, max_size / img.height)
+                new_size = (int(img.width * ratio), int(img.height * ratio))
+                img = img.resize(new_size, Image.Resampling.LANCZOS)
 
         # Create layers
         watermark = Image.new('RGBA', img.size, (0, 0, 0, 0))
@@ -108,6 +117,7 @@ def parse_args() -> Dict[str, Any]:
     parser.add_argument('--shadow-offset-y', type=int, default=3, help='Shadow offset Y')
     parser.add_argument('--shadow-blur', type=int, default=3, help='Shadow blur radius')
     parser.add_argument('--shadow-opacity', type=float, default=0.7, help='Shadow opacity (0-1)')
+    parser.add_argument('--downsize-to', type=int, help='Maximum size in pixels for any dimension')
 
     return vars(parser.parse_args())
 
@@ -145,7 +155,8 @@ def main():
             'offset_y': args['shadow_offset_y'],
             'blur': args['shadow_blur'],
             'opacity': args['shadow_opacity']
-        }
+        },
+        downsize_to=args['downsize_to']
     )
 
     # Create output folder
