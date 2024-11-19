@@ -92,25 +92,26 @@ def add_watermark(image_path: str, output_path: str, options: WatermarkOptions) 
         # Save result in original format
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         original_format = Image.open(image_path).format or 'PNG'
-        
+        print(f"Format: {original_format}")
         # Convert to RGB if saving as JPEG
-        if original_format.upper() in ['JPEG', 'JPG']:
+        if original_format.upper() in ['JPEG', 'JPG', 'MPO']:
             result = result.convert('RGB')
-            
+
         result.save(output_path, original_format)
 
 
 def process_images(input_folder: str, output_folder: str, options: WatermarkOptions) -> None:
     """Process all images in the input folder and its subfolders."""
     input_path = Path(input_folder)
-    output_path = Path(output_folder)
+    output_folder_path = Path(output_folder)
 
     for img_path in input_path.rglob('*'):
         if img_path.suffix.lower() in ['.jpg', '.jpeg', '.png', '.bmp', '.tiff']:
             relative_path = img_path.relative_to(input_path)
-            output_path = output_path / relative_path
+            output_path = output_folder_path / relative_path
 
             print(f"Processing: {img_path}")
+            print(f"Saving to: {output_path}")
             add_watermark(str(img_path), str(output_path), options)
 
 
